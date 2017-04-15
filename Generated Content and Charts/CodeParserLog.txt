@@ -1,0 +1,8 @@
+
+Total Empty Files: 1112
+Total Empty Projects: 0
+Total Files: 69265
+Total Files that passed compilation: 69070
+
+
+DONE!!!
