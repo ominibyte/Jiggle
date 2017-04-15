@@ -1,0 +1,164 @@
+For number of methods in the analyzed project
+
+SELECT `method_count`, COUNT(*) AS project_count FROM `project_stats` WHERE `class_count` > 0 AND method_count IN (1, 8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,144,152,160,168,176,184,192,200,208,216,224,232,240,248,256,264,272,280,288,296,304,312,320,328,336,344,352,360,368,376,384,392,400,408,416,424,432,440,448,456,464,472,480,488,496,504,512,520,528,536,544,552,560,568,576,584,592,600,608,616,624,632,640,648,656,664,672,680,688,696,704,712,720,728,736,744,752,760,768,776,784,792,800,808,816) GROUP BY `method_count` ORDER BY `method_count`
+
+
+For cyclomatic complexity per file
+
+SELECT `value` AS complexity, COUNT(*) AS file_count FROM code_smell_violation_codesize INNER JOIN code_smell_violation ON code_smell_violation.id = code_smell_violation_codesize.fkcode_smell_violation WHERE code_smell_violation.method IS NULL AND code_smell_violation.fkrule = (SELECT id FROM code_smell_rules WHERE rule = 'CyclomaticComplexity') AND `value` IN (1,2,3,4,5,6,7,8,9,10,16,32,64,128,256,512,1024,2048,4096) GROUP BY file ORDER BY `complexity` ASC
+
+
+For number of classes in the analyzed project
+
+SELECT `class_count`, COUNT(*) AS project_count FROM `project_stats` WHERE `class_count` > 0 AND class_count IN (1,2,3,4,5,6,7,8,9,10,16,24,32,40,48,56,64) GROUP BY `class_count` ORDER BY `class_count`
+
+
+For number of interfaces per project
+
+SELECT `interface_count`, COUNT(*) AS project_count FROM `project_stats` WHERE `class_count` > 0 GROUP BY `interface_count` ORDER BY `interface_count`
+
+
+For abstract classes per project
+
+SELECT `abs_class_count`, COUNT(*) AS project_count FROM `project_stats` WHERE `class_count` > 0 GROUP BY `abs_class_count` ORDER BY `abs_class_count`
+
+
+For class inheritance per project
+
+SELECT `class_inheritance_count`, COUNT(*) AS project_count FROM `project_stats` WHERE `class_count` > 0 GROUP BY `class_inheritance_count` ORDER BY `class_inheritance_count`
+
+
+For Same File code duplication by tokens...so the number files for each duplication having the given number of tokens
+
+SELECT COUNT(*) AS file_count, tokens FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) > 1 ORDER BY fkcpd_duplication) GROUP BY tokens ORDER BY tokens
+
+
+For Different Files code duplication by tokens...so the number files for each duplication having the given number of tokens
+
+SELECT COUNT(*) AS file_count, tokens FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) <= 1 ORDER BY fkcpd_duplication) GROUP BY tokens ORDER BY tokens
+
+
+For Same File code duplication by lines...so the number files for each duplication having the given number of lines
+
+SELECT COUNT(*) AS file_count, lines_of_code FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) > 1 ORDER BY fkcpd_duplication) GROUP BY lines_of_code ORDER BY lines_of_code
+
+
+For Different Files code duplication by lines...so the number files for each duplication having the given number of lines
+
+SELECT COUNT(*) AS file_count, lines_of_code FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) <= 1 ORDER BY fkcpd_duplication) GROUP BY lines_of_code ORDER BY lines_of_code
+
+
+Finding the number of projects having GodClass = 750/5993 = 12.5%
+
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation_godclass` INNER JOIN code_smell_violation ON code_smell_violation.id = code_smell_violation_godclass.fkcode_smell_violation INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell
+
+Finding the number of projects having dead/unused code = 3042/5993 = 50.8%
+
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation` INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule IN (1,8,16,98,130)
+
+
+
+
+49.7% (2,965) of projects make up 20% (13,658) of the total classes
+
+
+
+
+57.8% (39,708) classes have McCabe Cyclomatic Complexity of 2
+
+To get the above, use:
+SELECT `value` AS complexity, COUNT(*) AS file_count FROM code_smell_violation_codesize INNER JOIN code_smell_violation ON code_smell_violation.id = code_smell_violation_codesize.fkcode_smell_violation WHERE code_smell_violation.method IS NULL AND code_smell_violation.fkrule = (SELECT id FROM code_smell_rules WHERE rule = 'CyclomaticComplexity') AND value = 2 ORDER BY `complexity` ASC
+
+
+The number of projects having code duplication within files by tokens:
+3666 (61.42) of 5968
+SELECT COUNT(DISTINCT(file_id)) AS project_count FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) > 1 ORDER BY fkcpd_duplication)
+
+The number of projects having code duplication across files by tokens:
+3679 (61.65) of 5968
+SELECT COUNT(DISTINCT(file_id)) AS project_count FROM cpd_duplication WHERE cpd_duplication.id IN (SELECT cpd_duplication.id FROM `cpd_duplication` INNER JOIN cpd_duplication_files ON cpd_duplication.id = `cpd_duplication_files`.`fkcpd_duplication` GROUP BY path, `cpd_duplication_files`.`fkcpd_duplication` HAVING COUNT(*) <= 1 ORDER BY fkcpd_duplication)
+
+The number of projects having dead code (for all dead codes):
+3042 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule IN (1,8,16,98,130)
+
+The number of projects having unused private field:
+1988 (33.3) of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule = 1
+
+The number of projects having unused local variable:
+1685 (28.2) of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule = 8
+
+The number of projects having unused private method:
+369 (6.18) of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule = 16
+
+The number of projects having unused formal parameter:
+302 (5.06) of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule = 98
+
+The number of projects having unused modifier:
+167 (2.8) of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `code_smell_violation`  INNER JOIN code_smell ON code_smell.id = code_smell_violation.fkcode_smell WHERE fkrule = 130
+
+The number of projects having excessive methods lengths (>=100):
+981 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 613
+
+The number of projects having excessive parameter lists (>=10):
+49 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 3078
+
+The number of projects having excessive class length (>=1000):
+123 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 298
+
+The number of projects having excessive public count (>=45):
+71 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 6058
+
+The number of projects having too many fields (>15):
+702 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 1382
+
+The number of projects having too many methods (>10):
+1090 () of 5968
+SELECT COUNT(DISTINCT(project_id)) FROM `new_code_smell_violation` INNER JOIN code_smell ON code_smell.id = new_code_smell_violation.fkcode_smell WHERE fkrule = 1497
+
+
+The number of projects with no abstract class
+5028 (84.25) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE abs_class_count = 0
+
+The number of projects with no abstract method
+5740 (96.18) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE abs_class_count = 0
+
+The number of projects with no polymorphism usage
+5647 (94.62) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE polymorphism_usage_count = 0
+
+The number of projects with no interface
+5738 (96.15) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE interface_count = 0
+
+The number of projects with no generic class
+5887 (98.64) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE gen_class_count = 0
+
+The number of projects with no generic method
+5959 (99.85) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE gen_method_count = 0
+
+The number of projects with no generic interface
+5898 (98.83) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE gen_interface_count = 0
+
+The number of projects with no class inheritance
+2575 (43.15) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE class_inheritance_count = 0
+
+The number of projects with no class inheritance
+5662 (94.87) of 5968
+SELECT COUNT(*) AS project_count FROM project_stats WHERE interface_inheritance_count = 0
